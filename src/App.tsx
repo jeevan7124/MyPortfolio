@@ -24,6 +24,8 @@ import connectionsIconDate from './assets/figma/connections-fluent-mdl2-date-tim
 import connectionsIconTime from './assets/figma/connections-fluent-mdl2-date-time-2-75_2023.svg'
 import connectionsIconLocation from './assets/figma/connections-line-md-map-marker-75_2027.svg'
 import journeyHero from './assets/figma/image-11-49_794.png'
+import aiGeeksLogo from './assets/figma/image-12-75_53.png'
+import fabCrewLogo from './assets/figma/fab-crew-logo-1-74_1680.png'
 
 function App() {
   const [hash, setHash] = useState(() => window.location.hash || '#home')
@@ -41,6 +43,17 @@ function App() {
     if (normalized.startsWith('#journey')) return 'journey'
     return 'home'
   }, [hash])
+
+  useEffect(() => {
+    if (route !== 'home') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+      return
+    }
+
+    if (hash === '#home' || hash === '') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+    }
+  }, [hash, route])
 
   const navLinks = [
     { href: '#home', label: 'Home' },
@@ -64,9 +77,9 @@ function App() {
   ] as const
 
   const featuredWorks = [
-    { title: 'AiGeeks', kind: 'Product', imageKey: 'aigeeks' },
+    { title: 'AiGeeks', kind: 'Product', imageKey: 'aigeeks', logoSrc: aiGeeksLogo },
     { title: 'Mobicharge', kind: 'Product', imageKey: 'mobicharge' },
-    { title: 'Grantify', kind: 'Product', imageKey: 'grantify' },
+    { title: 'Grantify', kind: 'Product', imageKey: 'grantify', logoSrc: grantifyLogo },
   ] as const
 
   const caseStudies = [
@@ -78,6 +91,7 @@ function App() {
         'Grantify is an education matching platform that connects students and universities through data-driven insights, enabling smarter opportunity discovery and efficient admissions.',
       imageKey: 'grantify',
       href: '#case-grantify',
+      logoSrc: grantifyLogo,
     },
     {
       number: '01',
@@ -87,6 +101,7 @@ function App() {
         'Connections is a professional networking platform that enables meaningful discussions, expert knowledge sharing, and credibility building through purposeful conversations and community-driven insights.',
       imageKey: 'connections',
       href: '#case-connections',
+      logoSrc: connectionsLogo,
     },
     {
       number: '01',
@@ -96,6 +111,7 @@ function App() {
         'The Fab Crew is a trusted home and commercial cleaning and maintenance company in Dubai, delivering reliable, high-quality services backed by professional teams and streamlined booking.',
       imageKey: 'fabcrew',
       href: '#contacts',
+      logoSrc: fabCrewLogo,
     },
   ] as const
 
@@ -261,19 +277,30 @@ function App() {
 
   return (
     <>
+      <header className="stickyNav">
+        <nav className="nav" aria-label="Primary">
+          {navLinks.map((link) => {
+            const isActive =
+              link.href === '#work' ||
+              (route !== 'home' && link.href === '#case-studies')
+            return (
+              <a
+                key={link.href}
+                className={`nav__link${isActive ? ' nav__link--active' : ''}`}
+                href={link.href}
+              >
+                {link.label}
+              </a>
+            )
+          })}
+        </nav>
+      </header>
+
       {route === 'home' ? (
       <section id="home" className="hero">
         <div className="heroStageWrap">
           <div className="heroStage">
             <div className="heroStage__bg" aria-hidden="true" />
-
-            <nav className="nav heroStage__nav" aria-label="Primary">
-              {navLinks.map((link) => (
-                <a key={link.href} className="nav__link" href={link.href}>
-                  {link.label}
-                </a>
-              ))}
-            </nav>
 
             <div className="heroStage__content">
               <div className="heroStage__header">
@@ -294,14 +321,6 @@ function App() {
       {route === 'case-grantify' ? (
         <main className="casePage">
           <div className="casePage__frame">
-            <nav className="nav casePage__nav" aria-label="Primary">
-              {navLinks.map((link) => (
-                <a key={link.href} className="nav__link" href={link.href}>
-                  {link.label}
-                </a>
-              ))}
-            </nav>
-
             <div className="casePage__content">
               <header className="caseHeader">
                 <h1 className="caseHeader__title">{caseStudyData.grantify.title}</h1>
@@ -366,14 +385,6 @@ function App() {
       {route === 'case-connections' ? (
         <main className="casePage">
           <div className="casePage__frame">
-            <nav className="nav casePage__nav" aria-label="Primary">
-              {navLinks.map((link) => (
-                <a key={link.href} className="nav__link" href={link.href}>
-                  {link.label}
-                </a>
-              ))}
-            </nav>
-
             <div className="casePage__content">
               <header className="caseHeader">
                 <h1 className="caseHeader__title">{caseStudyData.connections.title}</h1>
@@ -498,14 +509,6 @@ function App() {
       {route === 'journey' ? (
         <main className="casePage">
           <div className="casePage__frame">
-            <nav className="nav casePage__nav" aria-label="Primary">
-              {navLinks.map((link) => (
-                <a key={link.href} className="nav__link" href={link.href}>
-                  {link.label}
-                </a>
-              ))}
-            </nav>
-
             <div className="casePage__content">
               <header className="caseHeader">
                 <h1 className="caseHeader__title">My Journey</h1>
@@ -556,7 +559,11 @@ function App() {
               <div className="cards cards--featured">
                 {featuredWorks.map((work) => (
                   <article key={work.title} className="card card--featured">
-                    <div className={`card__thumb card__thumb--${work.imageKey}`} />
+                    <div className={`card__thumb card__thumb--${work.imageKey}`}>
+                      {'logoSrc' in work ? (
+                        <img className="featuredLogo" src={work.logoSrc} alt={`${work.title} logo`} />
+                      ) : null}
+                    </div>
                     <div className="card__meta">
                       <div className="card__title">{work.title}</div>
                       <div className="card__tag">{work.kind}</div>
@@ -583,19 +590,27 @@ function App() {
           <section id="case-studies" className="section section--caseStudies">
             <div className="container">
               <h2 className="sectionHeading">UX Case Studies</h2>
-              <div className="cards cards--caseStudies">
-                {caseStudies.map((cs) => (
-                  <article key={cs.title} className={`case case--${cs.imageKey}`}>
-                    <div className="case__top">
-                      <div className="case__index">
-                        <span className="case__number">{cs.number}</span>
-                        <span className="case__year">{cs.year}</span>
-                      </div>
+              <div className="uxGrid">
+                {caseStudies.map((cs, index) => (
+                  <article
+                    key={cs.title}
+                    className={`uxItem ${index % 2 === 1 ? 'uxItem--reverse' : ''}`}
+                  >
+                    <div className={`uxVisual uxVisual--${cs.imageKey}`} aria-hidden="true">
+                      <img className="uxVisual__logo" src={cs.logoSrc} alt="" />
                     </div>
-                    <div className="case__content">
-                      <h3 className="case__title">{cs.title}</h3>
-                      <p className="case__desc">{cs.description}</p>
-                      <a className="case__link" href={cs.href}>
+                    <div className="uxCopy">
+                      <div className="uxMetaRow">
+                        <span className="uxDot" aria-hidden="true" />
+                        <div className="uxMetaText">
+                          <span className="uxMetaNumber">{cs.number}</span>
+                          <span className="uxMetaSep">—</span>
+                          <span className="uxMetaYear">{cs.year}</span>
+                        </div>
+                      </div>
+                      <h3 className="uxTitle">{cs.title}</h3>
+                      <p className="uxDesc">{cs.description}</p>
+                      <a className="uxLink" href={cs.href}>
                         Read Case Study
                       </a>
                     </div>
@@ -608,15 +623,37 @@ function App() {
           <section id="contacts" className="section section--gallery">
             <div className="container">
               <h2 className="sectionHeading">Graphics Gallery</h2>
-              <div className="gallery">
-                {galleryImages.map((img) => (
-                  <div
-                    key={img.imageKey}
-                    className={`gallery__item gallery__item--${img.imageKey}`}
-                    role="img"
-                    aria-label={img.alt}
-                  />
-                ))}
+              <div className="graphicsGrid">
+                <div
+                  className="gItem gItem--topLeft gallery__item--gallery-2"
+                  role="img"
+                  aria-label={galleryImages[1].alt}
+                />
+                <div
+                  className="gItem gItem--centerTall gallery__item--gallery-5 gItem--fold"
+                  role="img"
+                  aria-label={galleryImages[4].alt}
+                />
+                <div
+                  className="gItem gItem--topRight gallery__item--gallery-4 gItem--fold"
+                  role="img"
+                  aria-label={galleryImages[3].alt}
+                />
+                <div
+                  className="gItem gItem--midLeft gallery__item--gallery-1"
+                  role="img"
+                  aria-label={galleryImages[0].alt}
+                />
+                <div
+                  className="gItem gItem--midRight gallery__item--gallery-6"
+                  role="img"
+                  aria-label={galleryImages[5].alt}
+                />
+                <div
+                  className="gItem gItem--bottomCenter gallery__item--gallery-3 gItem--fold"
+                  role="img"
+                  aria-label={galleryImages[2].alt}
+                />
               </div>
             </div>
           </section>
@@ -656,8 +693,8 @@ function App() {
                     Facebook
                   </a>
                 </div>
-                <div className="footer__handle">@DESIGNWITHJEEVAN</div>
               </div>
+              <div className="footer__handleBig">@DESIGNWITHJEEVAN</div>
             </div>
           </footer>
         </>
